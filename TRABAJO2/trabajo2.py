@@ -166,7 +166,7 @@ plt.figure(4)
 plt.plot(x,y)
 plt.scatter(nx, ny, label="positivos")
 plt.scatter(px, py, label="negativos")
-plt.title("Puntos separados por la recta y=ax+b ")
+plt.title("Puntos separados por la recta y=ax+b con ruido")
 plt.xlabel("X")
 plt.ylabel("Y")
 plt.legend(loc="lower right")
@@ -189,24 +189,29 @@ def f4(x,y):
 
 recta1, recta2, recta3, recta4 = [], [], [], []
 
-puntos = simula_unif(100, 2, [-50, 50])
+x1 = np.linspace(-50, 50, 100)
+y1 = np.linspace(-50, 50, 100)
+x1, y1 = np.meshgrid(x1, y1)
+recta1 = f1(x1,y1)
 
-for i in puntos:
-    recta1.append(f1(i[0], i[1]))
-    recta2.append(f1(i[0], i[1]))
-    recta3.append(f1(i[0], i[1]))
-    recta4.append(f1(i[0], i[1]))
-    
-recta1 = np.transpose(recta1)
-recta2 = np.transpose(recta2)
-recta3 = np.transpose(recta3)
-recta4 = np.transpose(recta4)
+x2 = np.linspace(-50, 50, 100)
+y2 = np.linspace(-50, 50, 100)
+x2, y2 = np.meshgrid(x2, y2)
+recta2 = f2(x2,y2)
 
-x1, y1 = recta1[0], recta1[1]
-    
+x3 = np.linspace(-50, 50, 100)
+y3 = np.linspace(-50, 50, 100)
+x3, y3 = np.meshgrid(x3, y3)
+recta3 = f3(x3,y3)
+
+x4 = np.linspace(-50, 50, 100)
+y4 = np.linspace(-50, 50, 100)
+x4, y4 = np.meshgrid(x4, y4)
+recta4 = f4(x4,y4)
+
 #Generación del gráfico
-plt.figure(4)
-plt.plot(x1,y1)
+plt.figure(5)
+plt.contour(x1,y1,recta1,[0])
 plt.scatter(nx, ny, label="positivos")
 plt.scatter(px, py, label="negativos")
 plt.title("Puntos separados por la recta y=ax+b ")
@@ -216,8 +221,8 @@ plt.legend(loc="lower right")
 plt.show()
 
 #Generación del gráfico
-plt.figure(4)
-plt.plot(x,y)
+plt.figure(6)
+plt.contour(x2,y2,recta2,[0])
 plt.scatter(nx, ny, label="positivos")
 plt.scatter(px, py, label="negativos")
 plt.title("Puntos separados por la recta y=ax+b ")
@@ -227,8 +232,8 @@ plt.legend(loc="lower right")
 plt.show()
 
 #Generación del gráfico
-plt.figure(4)
-plt.plot(x,y)
+plt.figure(7)
+plt.contour(x3,y3,recta3,[0])
 plt.scatter(nx, ny, label="positivos")
 plt.scatter(px, py, label="negativos")
 plt.title("Puntos separados por la recta y=ax+b ")
@@ -238,8 +243,8 @@ plt.legend(loc="lower right")
 plt.show()
 
 #Generación del gráfico
-plt.figure(4)
-plt.plot(x,y)
+plt.figure(8)
+plt.contour(x4,y4,recta4,[0])
 plt.scatter(nx, ny, label="positivos")
 plt.scatter(px, py, label="negativos")
 plt.title("Puntos separados por la recta y=ax+b ")
