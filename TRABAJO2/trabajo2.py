@@ -314,11 +314,46 @@ suma_iteraciones = suma_iteraciones / 10
 
 print("Número de iteraciones necesarias: ", suma_iteraciones, "\n")
 
+pos, neg = [], []
+for i in range(len(predicciones)):
+    if predicciones[i] > 0.0: pos.append(puntos[i])
+    else: neg.append(puntos[i]) 
+    
+pos = np.transpose(pos)
+posx, posy = pos[1], pos[2]
+
+neg = np.transpose(neg)
+negx, negy = neg[1], neg[2]
+
+a = -(pesos[0]/pesos[2])/(pesos[0]/pesos[1])
+b = -pesos[0]/pesos[2]
+
+x = np.linspace(-50,50,100)
+y = a*x + b
+
+#Generación del gráfico
+plt.figure(9)
+plt.plot(x,y)
+plt.scatter(posx, posy, label="positivos")
+plt.scatter(negx, negy, label="negativos")
+plt.title("Frontera obtenida mediante perceptron ")
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.legend(loc="lower right")
+plt.show()
+
 input("Pulse una tecla para pasar al siguiente apartado")
 print("Apartado 1b\n")
 
 #unir en el vector puntos los datos del apartado 2b de la sección 1
 puntos = np.concatenate((positivos, negativos))
+
+predicciones = []
+for i in range(len(positivos)):
+    predicciones.append(1.0)
+    
+for i in range(len(negativos)):
+    predicciones.append(-1.0)
 
 #modificar el vector de puntos para añadir la primera columna de unos
 puntos = np.transpose(puntos)
@@ -352,3 +387,35 @@ for j in range(10):
 suma_iteraciones = suma_iteraciones / 10
 
 print("Número de iteraciones necesarias: ", suma_iteraciones, "\n")
+
+positivos = np.transpose(positivos)
+unos = np.ones(len(positivos[0]))
+positivos = np.insert(positivos, 0, unos, axis=0)
+posx, posy = positivos[1], positivos[2]
+
+negativos = np.transpose(negativos)
+unos = np.ones(len(negativos[0]))
+negativos = np.insert(negativos, 0, unos, axis=0)
+negx, negy = negativos[1], negativos[2]
+
+a = -(pesos[0]/pesos[2])/(pesos[0]/pesos[1])
+b = -pesos[0]/pesos[2]
+
+x = np.linspace(-50,50,100)
+y = a*x + b
+
+#Generación del gráfico
+plt.figure(10)
+plt.plot(x,y)
+plt.scatter(posx, posy, label="positivos")
+plt.scatter(negx, negy, label="negativos")
+plt.title("Frontera obtenida mediante perceptron ")
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.legend(loc="lower right")
+plt.show()
+
+input("Pulse una tecla para pasar al siguiente apartado")
+print("Apartado 2a\n")
+
+X = simula_unif(100, 2, (0,2))
