@@ -252,3 +252,103 @@ plt.xlabel("X")
 plt.ylabel("Y")
 plt.legend(loc="lower right")
 plt.show()
+
+input("Pulse una tecla para pasar al siguiente ejercicio")
+print("MODELOS LINEALES\n")
+print("Apartado 1. Algoritmo Perceptron\n")
+
+def ajusta_PLA(datos, label, max_iter, vini):
+    #inicializar el vector de pesos y los contadores
+    w = vini
+    contador = 0
+    num_cambios = 1
+    
+    #itera mientras que no se haya llegado al número máximo de iteraciones, 
+    #   o hasta que todos los datos estén bien clasificados
+    while contador < max_iter and num_cambios > 0:
+        num_cambios = 0
+        
+        #en una iteración se recorren todos los datos
+        for i in range(len(datos)):
+            #si un dato está mal clasificado, se modifica el vector de pesos
+            if np.sign(np.dot(np.transpose(w),datos[i])) != label[i]:
+                w = w + label[i] * datos[i]
+                num_cambios += 1
+                
+        contador += 1
+
+    return w, contador
+
+# modificar el vector de puntos del apartado 2a de la sección 1 para añadir la 
+#   columna de unos en la posición 0 
+puntos = np.transpose(puntos)
+unos = np.ones(len(puntos[0]))
+
+puntos = np.insert(puntos, 0, unos, axis=0)
+puntos = np.transpose(puntos)
+    
+print("Apartado 1a\n")
+print("(a)")
+
+#inicializar el vector de pesos con ceros
+w = np.zeros(len(puntos[0]))
+
+#obtener el vector resultante, usando 10000 iteraciones como tope
+pesos, iteraciones = ajusta_PLA(puntos, predicciones, 10000, w)
+
+print("Número de iteraciones necesarias: ", iteraciones, "\n")
+
+print("(b)")
+
+suma_iteraciones = 0
+for j in range(10):
+    #inicializar el vector de pesos con valores aleatorios en el intervalo [0,1]
+    w = np.random.rand(len(puntos[0]))
+    
+    #obtener el vector resultante, usando 10000 iteraciones como tope
+    pesos, iteraciones = ajusta_PLA(puntos, predicciones, 10000, w)
+    
+    suma_iteraciones += iteraciones
+    
+suma_iteraciones = suma_iteraciones / 10
+
+print("Número de iteraciones necesarias: ", suma_iteraciones, "\n")
+
+input("Pulse una tecla para pasar al siguiente apartado")
+print("Apartado 1b\n")
+
+#unir en el vector puntos los datos del apartado 2b de la sección 1
+puntos = np.concatenate((positivos, negativos))
+
+#modificar el vector de puntos para añadir la primera columna de unos
+puntos = np.transpose(puntos)
+unos = np.ones(len(puntos[0]))
+
+puntos = np.insert(puntos, 0, unos, axis=0)
+puntos = np.transpose(puntos)
+
+print("(a)")
+
+#inicializar el vector de pesos con ceros
+w = np.zeros(len(puntos[0]))
+
+#obtener el vector resultante, usando 10000 iteraciones como tope
+pesos, iteraciones = ajusta_PLA(puntos, predicciones, 10000, w)
+
+print("Número de iteraciones necesarias: ", iteraciones, "\n")
+
+print("(b)")
+
+suma_iteraciones = 0
+for j in range(10):
+    #inicializar el vector de pesos con valores aleatorios en el intervalo [0,1]
+    w = np.random.rand(len(puntos[0]))
+    
+    #obtener el vector resultante, usando 10000 iteraciones como tope
+    pesos, iteraciones = ajusta_PLA(puntos, predicciones, 10000, w)
+    
+    suma_iteraciones += iteraciones
+    
+suma_iteraciones = suma_iteraciones / 10
+
+print("Número de iteraciones necesarias: ", suma_iteraciones, "\n")
