@@ -5,7 +5,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 # Fijamos la semilla
 np.random.seed(1)
 
@@ -418,4 +417,171 @@ plt.show()
 input("Pulse una tecla para pasar al siguiente apartado")
 print("Apartado 2a\n")
 
+#función que calcula la función logística
+def sigmoide(X):
+    return 1/(np.exp(-X)+1)
+
+#función que calcula la probabilidad de que X sea positivo
+def probabilidad(X, w):
+    return sigmoide(np.dot(X, w))
+
+#función que modifica el vector de pesos
+def actualizar_pesos(X, y, w, eta):
+    #se calcula la probabilidad de que X sea positivo
+    predicciones = probabilidad(X, w)
+    #se calcula el gradiente 
+    gradiente = np.dot(np.transpose(X), predicciones - y)
+    #se resta al vector de pesos la media para cada elemento de X de multiplicar
+    #   el gradiente por el learning rate
+    w -= gradiente * eta / len(X)
+    return w
+
+eta = 0.1
+
+#obtener los puntos
 X = simula_unif(100, 2, (0,2))
+#insertar una columna de unos en primer lugar
+X = np.transpose(X)
+unos = np.ones(len(X[0]))
+X = np.insert(X, 0, unos, axis=0)
+X = np.transpose(X)
+
+#generar dos puntos aleatorios del dominio y la recta que pasa por ellos
+punto1 = simula_unif(1, 2, (0,2))
+punto2 = simula_unif(1, 2, (0,2))
+
+a = (punto2[0][1] - punto1[0][1]) / (punto2[0][0] - punto1[0][0])
+b = X[0][2] - a * X[0][1]
+
+#obtener las etiquetas para cada punto en función de la recta generada
+y = []
+for i in range(len(X)):
+    valor = f(X[i][1], X[i][2])
+    if valor == 1.0: y.append(valor)
+    else: y.append(0.0) 
+
+#inicializar el vector de pesos a 0
+w = np.zeros(3)
+
+#función que calcula el vector de pesos para una muestra X con unas etiquetas y
+# usando regresiçon logística implementada con SGD
+def SGD_LG(X, y, w):
+    num_iteraciones = 0
+    pesos = w
+    pesos_anterior = np.ones(3)
+    resta = pesos_anterior - pesos
+    
+    X_aux, y_aux = np.copy(X), np.copy(y)
+    
+    #itera mientras ||w(t−1)−w(t)|| sea mayor que 0.01
+    while np.linalg.norm(resta) > 0.01:
+        #guarda el vector de pesos para hacer la comprobación del bucle
+        pesos_anterior = np.copy(pesos)
+        
+        #hace una permutación aleatoria en el orden de los datos
+        #usando la variable estado para hacer la misma permutación en los dos vectores
+        estado = np.random.get_state()
+        np.random.shuffle(X_aux)
+        np.random.set_state(estado)
+        np.random.shuffle(y_aux)
+        
+        i = 16
+        #recorre los datos de X en mini-batches de 16 elementos
+        while (i < len(X)):
+            #obtiene los elementos del mini-batch
+            batch_x, batch_y = X_aux[i-16:i], y_aux[i-16:i]
+            #los usa para actualizar el vector de pesos
+            pesos = actualizar_pesos(batch_x, batch_y, pesos, eta)
+            i += 16
+        
+        resta = pesos_anterior - pesos
+        num_iteraciones += 1
+    
+    return pesos, num_iteraciones
+
+#calcula el vector de pesos para los datos generados
+pesos, iteraciones = SGD_LG(X, y, w)     
+  
+print("Número de iteraciones necesarias: ", iteraciones, "\n")
+
+pos, neg = [], []
+for i in range(len(y)):
+    if y[i] == 1.0: pos.append(X[i])
+    else: neg.append(X[i]) 
+    
+pos = np.transpose(pos)
+posx, posy = pos[1], pos[2]
+
+neg = np.transpose(neg)
+negx, negy = neg[1], neg[2]
+
+x = np.linspace(0,2,100)
+y = (-pesos[0]-pesos[1]*x)/pesos[2]
+
+#Generación del gráfico
+plt.figure(11)
+plt.plot(x,y)
+plt.scatter(posx, posy, label="positivos")
+plt.scatter(negx, negy, label="negativos")
+plt.title("Frontera obtenida mediante SGD")
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.legend(loc="lower right")
+plt.show()
+
+input("Pulse una tecla para pasar al siguiente apartado")
+print("Apartado 2b\n")
+
+# Funcion para calcular el error
+def Err(h_x, y):
+    dif = np.subtract(h_x, y)
+    return float(np.count_nonzero(dif)) / len(dif)
+
+#obtener los puntos de prueba
+prueba_x = simula_unif(1000, 2, (0,2))
+#insertar una columna de unos en primer lugar
+prueba_x = np.transpose(prueba_x)
+unos = np.ones(len(prueba_x[0]))
+prueba_x = np.insert(prueba_x, 0, unos, axis=0)
+prueba_x = np.transpose(prueba_x)
+
+#obtener las etiquetas correspondientes a los puntos
+prueba_y = []
+for i in range(len(prueba_x)):
+    valor = f(prueba_x[i][1], prueba_x[i][2])
+    if valor == 1.0: prueba_y.append(valor)
+    else: prueba_y.append(0.0)
+
+#calcular las predicciones para los puntos de prueba usando el vector de pesos
+#   generado antes
+predicciones = []
+for i in range(len(prueba_x)):
+    pred = np.dot(np.transpose(pesos), prueba_x[i])
+    if pred > 0.5: predicciones.append(1.0)
+    else: predicciones.append(0.0)
+    
+#cálculo del error fuera de la muestra
+Eout = Err(predicciones, prueba_y)
+print("Eout: ", Eout)
+
+pos, neg = [], []
+for i in range(len(predicciones)):
+    if predicciones[i] == 1.0: pos.append(prueba_x[i])
+    else: neg.append(prueba_x[i]) 
+    
+pos = np.transpose(pos)
+posx, posy = pos[1], pos[2]
+
+neg = np.transpose(neg)
+negx, negy = neg[1], neg[2]
+
+#Generación del gráfico
+plt.figure(12)
+plt.plot(x,y)
+plt.scatter(posx, posy, label="positivos")
+plt.scatter(negx, negy, label="negativos")
+plt.title("Frontera obtenida mediante SGD")
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.legend(loc="lower right")
+plt.show()
